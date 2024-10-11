@@ -1,0 +1,58 @@
+{
+  "name": "@ksv90/fsm",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "author": "ksv90",
+  "license": "MIT",
+  "main": "dist/main.js",
+  "type": "module",
+  "files": [
+    "/dist"
+  ],
+  ".": {
+    "import": "./dist/main.js",
+    "types": "./dist/main.d.ts"
+  },
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "pnpm test:unit & pnpm test:type",
+    "test:unit": "vitest --run",
+    "test:bench": "vitest bench --run",
+    "test:type": "vitest --typecheck --run",
+    "prepare": "husky",
+    "prepublish": "pnpm run build"
+  },
+  "dependencies": {
+    "@ksv90/decorators": "^0.1.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.6.1",
+    "@commitlint/config-conventional": "^18.6.3",
+    "@types/node": "^20.16.11",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.8",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "packageManager": "pnpm@8.11.0",
+  "homepage": "https://github.com/ksv90/fsm",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksv90/fsm.git"
+  }
+}
