@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/ksv90/fsm/compare/v0.0.1...v0.0.2) (2024-10-13)
+
+
+### Bug Fixes
+
+* types fixed ([67f426b](https://github.com/ksv90/fsm/commit/67f426b709a067a43aab0a3bdc745bc38a4db88c))
+
 ## 0.0.1 (2024-10-11)
 
 
