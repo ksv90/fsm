@@ -54,8 +54,8 @@ const fsm = new FiniteStateMachine({
 });
 
 // Subscribing to FSM events using EventEmitter
-fsm.on('transition', (_ctx, { prevStateName, nextStateName }) => {
-  console.log(`Переход: ${prevStateName} -> ${nextStateName}`);
+fsm.on('transition', ({ stateName, nextStateName }) => {
+  console.log(`Переход: ${stateName} -> ${nextStateName}`);
 });
 
 // Starting the FSM and state transitions
@@ -89,7 +89,7 @@ const fsm = new FiniteStateMachine({
       exit: [(context) => (context.count -= 1)],
       on: {
         START: [
-          { target: 'running', cond: (ctx) => ctx.count > 0, actions: [(ctx) => (ctx.count *= 2)] },
+          { target: 'running', cond: (context) => context.count > 0, actions: [(context) => (context.count *= 2)] },
         ],
       },
     },
@@ -127,7 +127,7 @@ The Transition Object describes possible state transitions and actions that are 
 ```ts
 idle: {
   on: { 
-    START: [{ target: 'running', cond: (ctx) => ctx.count > 0, actions: [(ctx) => (ctx.count *= 2)] }] 
+    START: [{ target: 'running', cond: (context) => context.count > 0, actions: [(context) => (context.count *= 2)] }] 
   },
 }
 ```
@@ -184,7 +184,7 @@ emit is used to automatically trigger events after the completion of state actio
 ```ts
 idle: {
   emit: [
-    { eventType: 'START', cond: (ctx) => ctx.count > 10 },
+    { eventType: 'START', cond: (context) => context.count > 10 },
   ],
 }
 ```
@@ -224,8 +224,6 @@ export type OptionsFSM = {
   errorMessages?: {
     getAlreadyStartedMessage?: () => string;
     getRestartNotAllowedMessage?: () => string;
-    getStopNotAllowedMessage?: () => string;
-    getAlreadyStoppedMessage?: () => string;
     getCannotSendIfNotStartedMessage?: () => string;
     getCannotSendWhenStoppedMessage?: () => string;
     getUnsupportedTransitionsMessage?: (stateName: string) => string;
@@ -249,7 +247,6 @@ const options: OptionsFSM = {
 const options: OptionsFSM = {
   errorMessages: {
     getAlreadyStartedMessage: () => 'FSM is already running and cannot be started again',
-    getStopNotAllowedMessage: () => 'FSM cannot be stopped in its current state',
   },
 };
 ```

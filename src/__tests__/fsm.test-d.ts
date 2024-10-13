@@ -66,8 +66,8 @@ test('State actions and conditions', () => {
   expectTypeOf(condCheck).toMatchTypeOf<(ctx: Context) => boolean>();
 
   // Проверка типов действий при входе и выходе
-  expectTypeOf(fsmConfig.states.idle.entry).toMatchTypeOf<ActionListFSM<StateName, EventType, NoInfer<Context>> | undefined>();
-  expectTypeOf(fsmConfig.states.active.exit).toMatchTypeOf<ActionListFSM<StateName, EventType, NoInfer<Context>> | undefined>();
+  expectTypeOf(fsmConfig.states.idle.entry).toMatchTypeOf<ActionListFSM<StateName, NoInfer<Context>> | undefined>();
+  expectTypeOf(fsmConfig.states.active.exit).toMatchTypeOf<ActionListFSM<StateName, NoInfer<Context>> | undefined>();
 });
 
 test('Invalid context configuration', () => {

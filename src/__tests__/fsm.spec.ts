@@ -28,14 +28,10 @@ describe('FiniteStateMachine basic functionality', () => {
     expect(fsm.status).toBe(StatusesFSM.stopped);
   });
 
-  it('should throw an error when stopping an FSM that is not started', () => {
+  it('should stop the not running fsm', () => {
     const fsm = new FiniteStateMachine({ initState: 'idle', context: {}, states: { idle: {} } });
-    const handler = vi.fn<[Error]>((error) => {
-      expect(error.message).toBe('Cannot stop an FSM that is not started');
-    });
-    fsm.on('error', handler);
     fsm.stop();
-    expect(handler).toHaveBeenCalled();
+    expect(fsm.status).toBe(StatusesFSM.stopped);
   });
 
   it('should transition to another state on a valid event', () => {
@@ -74,7 +70,7 @@ describe('FiniteStateMachine basic functionality', () => {
       states: {
         idle: {
           on: {
-            START: [{ target: 'running', cond: (ctx) => ctx.canStart }],
+            START: [{ target: 'running', cond: (context) => context.canStart }],
           },
         },
         running: {},

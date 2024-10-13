@@ -53,8 +53,8 @@ const fsm = new FiniteStateMachine({
 });
 
 // Подписка на события FSM с помощью EventEmitter
-fsm.on('transition', (_ctx, { prevStateName, nextStateName }) => {
-  console.log(`Переход: ${prevStateName} -> ${nextStateName}`);
+fsm.on('transition', ({ stateName, nextStateName }) => {
+  console.log(`Переход: ${stateName} -> ${nextStateName}`);
 });
 
 // Запуск FSM и переходы между состояниями
@@ -87,7 +87,7 @@ const fsm = new FiniteStateMachine({
       exit: [(context) => (context.count -= 1)],
       on: {
         START: [
-          { target: 'running', cond: (ctx) => ctx.count > 0, actions: [(ctx) => (ctx.count *= 2)] },
+          { target: 'running', cond: (context) => context.count > 0, actions: [(context) => (context.count *= 2)] },
         ],
       },
     },
@@ -124,7 +124,7 @@ Transition Object описывает возможные переходы меж�
 ```ts
 idle: {
   on: { 
-    START: [{ target: 'running', cond: (ctx) => ctx.count > 0, actions: [(ctx) => (ctx.count *= 2)] }] 
+    START: [{ target: 'running', cond: (context) => context.count > 0, actions: [(context) => (context.count *= 2)] }] 
   },
 }
 ```
@@ -181,7 +181,7 @@ emit используется для автоматического запуск
 ```ts
 idle: {
   emit: [
-    { eventType: 'START', cond: (ctx) => ctx.count > 10 },
+    { eventType: 'START', cond: (context) => context.count > 10 },
   ],
 }
 ```
@@ -221,8 +221,6 @@ export type OptionsFSM = {
   errorMessages?: {
     getAlreadyStartedMessage?: () => string;
     getRestartNotAllowedMessage?: () => string;
-    getStopNotAllowedMessage?: () => string;
-    getAlreadyStoppedMessage?: () => string;
     getCannotSendIfNotStartedMessage?: () => string;
     getCannotSendWhenStoppedMessage?: () => string;
     getUnsupportedTransitionsMessage?: (stateName: string) => string;
@@ -245,7 +243,6 @@ const options: OptionsFSM = {
 const options: OptionsFSM = {
   errorMessages: {
     getAlreadyStartedMessage: () => 'FSM уже запущен и не может быть запущен снова.',
-    getStopNotAllowedMessage: () => 'FSM не может быть остановлен в текущем состоянии.',
   },
 };
 ```

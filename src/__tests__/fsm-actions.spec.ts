@@ -18,8 +18,8 @@ function createFSM(): ConfigFSM<StateName, EventType, FSMContext> {
             {
               target: 'active',
               actions: [
-                (ctx) => {
-                  ctx.count += 1;
+                (context) => {
+                  context.count += 1;
                 },
               ],
             },
@@ -32,9 +32,9 @@ function createFSM(): ConfigFSM<StateName, EventType, FSMContext> {
             {
               target: 'stopped',
               actions: [
-                async (ctx) => {
+                async (context) => {
                   await new Promise((r) => setTimeout(r, 100));
-                  ctx.count -= 1;
+                  context.count -= 1;
                 },
               ],
             },
@@ -82,8 +82,8 @@ describe('FiniteStateMachine actions', () => {
   });
 
   it('synchronous action call count', () => {
-    const syncActionSpy = vi.fn((ctx: FSMContext) => {
-      ctx.count += 1;
+    const syncActionSpy = vi.fn((context: FSMContext) => {
+      context.count += 1;
     });
 
     // Модифицируем конфигурацию для использования spy
@@ -95,9 +95,9 @@ describe('FiniteStateMachine actions', () => {
   });
 
   it('asynchronous action call count', async () => {
-    const asyncActionSpy = vi.fn(async (ctx: FSMContext) => {
+    const asyncActionSpy = vi.fn(async (context: FSMContext) => {
       await new Promise((r) => setTimeout(r, 100));
-      ctx.count -= 1;
+      context.count -= 1;
     });
 
     // Модифицируем конфигурацию для использования spy
