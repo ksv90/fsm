@@ -25,19 +25,17 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
 
   readonly #jobs = new Set<Promise<void>>();
 
-  readonly #actionHandler = (action: ActionFuncFSM<TStateName, TEventType, TContext>): void => action(this.#context, this);
+  readonly #actionHandler = (action: ActionFuncFSM<TStateName, TContext>): void => action(this.#context, { stateName: this.#stateName });
 
-  readonly #sendError = (error: unknown): Error => {
+  readonly #sendError = (error: unknown): void => {
+    if (this.#status === StatusesFSM.stopped) return;
     let errorInstance: Error;
     if (error instanceof Error) errorInstance = error;
     else if (typeof error === 'string') errorInstance = new Error(error);
     else if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') errorInstance = new Error(error.message);
     else errorInstance = new Error('unknown error');
-    if (this.#status !== StatusesFSM.stopped) {
-      this.emit('error', errorInstance, this.#context, this);
-      this.stop();
-    }
-    return errorInstance;
+    this.emit('error', errorInstance, { context: this.#context, stateName: this.#stateName }, this);
+    this.stop();
   };
 
   constructor(config: ConfigFSM<TStateName, TEventType, TContext>, options?: OptionsFSM) {
@@ -76,29 +74,16 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     const [stateName, context] = [this.#stateName, this.#context];
     const currentState = this.#stateList[stateName];
     this.#status = StatusesFSM.active;
-    this.emit('start', context, this);
-    this.emit('entry', context, this);
+    this.emit('start', { context, stateName }, this);
+    this.emit('entry', { context, stateName }, this);
     currentState.entry?.forEach(this.#actionHandler);
     this.#runJob().catch(this.#sendError);
   }
 
   stop(): void {
-    try {
-      switch (this.#status) {
-        case StatusesFSM.notStarted: {
-          const message = this.#options.errorMessages?.getStopNotAllowedMessage?.();
-          throw new Error(message ?? 'Cannot stop an FSM that is not started');
-        }
-        case StatusesFSM.stopped: {
-          const message = this.#options.errorMessages?.getAlreadyStoppedMessage?.();
-          throw new Error(message ?? 'FSM is already stopped');
-        }
-      }
-    } catch (error) {
-      this.emit('error', error as Error, this.#context, this);
-    }
+    if (this.#status === StatusesFSM.stopped) return;
     this.#status = StatusesFSM.stopped;
-    this.emit('stop', this.#context, this);
+    this.emit('stop', { context: this.#context, stateName: this.#stateName }, this);
     this.removeAllListeners();
   }
 
@@ -133,7 +118,7 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
       return;
     }
 
-    const transitionObject = transitionObjects.find(({ cond }) => cond?.(context, this) ?? true);
+    const transitionObject = transitionObjects.find(({ cond }) => cond?.(context, { stateName }) ?? true);
 
     if (!transitionObject) {
       const message = this.#options.errorMessages?.getNoTransitionObjectMessage?.(stateName, eventType);
@@ -144,24 +129,26 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     const nextStateName = transitionObject.target;
     const nextState = stateList[nextStateName];
 
-    this.emit('exit', context, this);
+    this.emit('exit', { context, stateName }, this);
     currentState.exit?.forEach(this.#actionHandler);
-    this.emit('transition', context, { prevStateName: stateName, nextStateName, eventType }, this);
+
+    this.emit('transition', { context, stateName, nextStateName, eventType }, this);
     transitionObject.actions?.forEach(this.#actionHandler);
-    this.emit('entry', context, this);
-    nextState.entry?.forEach(this.#actionHandler);
 
     this.#stateName = nextStateName;
     this.#stateId = {};
+    this.emit('entry', { context, stateName: nextStateName }, this);
+    nextState.entry?.forEach(this.#actionHandler);
+
     this.#runJob().catch(this.#sendError);
   }
 
   async #runJob(): Promise<void> {
-    const [context, stateId] = [this.#context, this.#stateId];
+    const [context, stateName, stateId] = [this.#context, this.#stateName, this.#stateId];
     const currentState = this.#stateList[this.#stateName];
 
     if (currentState.job) {
-      this.emit('job', context, this);
+      this.emit('job', { context, stateName }, this);
       const timerId = this.#startTimer();
       const job = createJob(currentState.job, context);
       this.#jobs.add(job);
@@ -173,15 +160,15 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     if (this.#status === StatusesFSM.stopped) return;
     if (this.#stateId !== stateId) return;
 
-    const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, this) ?? true);
+    const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
     if (emitObject?.eventType) return this.send(emitObject.eventType);
 
     if (currentState.on) {
-      this.emit('pending', context, this);
+      this.emit('pending', { context, stateName }, this);
     } else {
       if (this.#jobs.size) await Promise.all(this.#jobs.values());
       if (this.#status !== StatusesFSM.active) return;
-      this.emit('finish', context, this);
+      this.emit('finish', { context, stateName }, this);
       this.stop();
     }
   }
@@ -193,7 +180,6 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     return setTimeout(() => {
       const message = this.#options.errorMessages?.getActionTimeLimitExceededMessage?.(stateName, timeForWork);
       this.#sendError(message ?? `The job function in state '${stateName}' has exceeded the allowed time limit of ${timeForWork}ms`);
-      return;
     }, timeForWork);
   }
 }
