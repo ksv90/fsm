@@ -11,6 +11,9 @@ export default defineConfig({
       formats: ['es'],
       fileName: 'main',
     },
+    rollupOptions: {
+      external: ['@ksv90/decorators'],
+    },
   },
   esbuild: {
     target: 'es2022',
