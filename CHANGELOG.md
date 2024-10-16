@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/ksv90/fsm/compare/v0.0.3...v0.0.4) (2024-10-16)
+
+
+### Bug Fixes
+
+* external field added to vite config ([b2c6eb4](https://github.com/ksv90/fsm/commit/b2c6eb4459000bc550e067a5e59aabe47c9c1305))
+
 ## [0.0.3](https://github.com/ksv90/fsm/compare/v0.0.2...v0.0.3) (2024-10-16)
 
 
