@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/ksv90/fsm/compare/v0.0.2...v0.0.3) (2024-10-16)
+
+
+### Bug Fixes
+
+* pack moved to peer deps ([40f310c](https://github.com/ksv90/fsm/commit/40f310cb0b5948db3087aab17b8abeac043e70a6))
+
 ## [0.0.2](https://github.com/ksv90/fsm/compare/v0.0.1...v0.0.2) (2024-10-13)
 
 
