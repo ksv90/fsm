@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/ksv90/fsm/compare/v0.0.5...v0.0.6) (2024-10-17)
+
+
+### Bug Fixes
+
+* decorators pack version updated ([7d4f22f](https://github.com/ksv90/fsm/commit/7d4f22f6da48ab7dc7943ce0077247019bd3e3bb))
+
 ## [0.0.5](https://github.com/ksv90/fsm/compare/v0.0.4...v0.0.5) (2024-10-17)
 
 
