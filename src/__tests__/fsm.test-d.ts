@@ -1,19 +1,19 @@
 import { expectTypeOf, test } from 'vitest';
 
-import type { FiniteStateMachine } from '../fsm';
-import type { ActionListFSM, ConfigFSM, NonEmptyArray, StateFSM, StatusesFSM } from '../types';
+import type { StateMachine } from '../fsm';
+import type { NonEmptyArray, StateMachineActionList, StateMachineConfig, StateMachineState, StateMachineStatus } from '../types';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
 type Context = { count: number };
 
-declare const fsmConfig: ConfigFSM<StateName, EventType, Context>;
-declare const fsm: FiniteStateMachine<StateName, EventType, Context>;
+declare const fsmConfig: StateMachineConfig<StateName, EventType, Context>;
+declare const fsm: StateMachine<StateName, EventType, Context>;
 
-test('FiniteStateMachine types', () => {
-  // Проверка типов состояния и статуса FSM
+test('StateMachine types', () => {
+  // Проверка типов состояния и статуса StateMachine
   expectTypeOf<typeof fsm.stateName>().toEqualTypeOf<StateName>();
-  expectTypeOf<typeof fsm.status>().toEqualTypeOf<StatusesFSM>();
+  expectTypeOf<typeof fsm.status>().toEqualTypeOf<StateMachineStatus>();
 
   // Проверка типа метода getContext
   expectTypeOf<typeof fsm.getContext>().returns.toEqualTypeOf<Context>();
@@ -34,15 +34,15 @@ test('FiniteStateMachine types', () => {
 });
 
 test('ConfigFSM types', () => {
-  // Проверка типа конфигурации FSM
-  expectTypeOf(fsmConfig).toMatchTypeOf<ConfigFSM<StateName, EventType, Context>>();
+  // Проверка типа конфигурации StateMachine
+  expectTypeOf(fsmConfig).toMatchTypeOf<StateMachineConfig<StateName, EventType, Context>>();
 
   // Проверка типа начального состояния и контекста
   expectTypeOf(fsmConfig.initState).toEqualTypeOf<StateName>();
   expectTypeOf(fsmConfig.context).toMatchTypeOf<Context>();
 
-  // Проверка типов состояний FSM
-  expectTypeOf(fsmConfig.states).toMatchTypeOf<Record<StateName, StateFSM<StateName, EventType, Context>>>();
+  // Проверка типов состояний StateMachine
+  expectTypeOf(fsmConfig.states).toMatchTypeOf<Record<StateName, StateMachineState<StateName, EventType, Context>>>();
 
   // Проверка типов переходов для состояний (с возможным undefined)
   expectTypeOf(fsmConfig.states.idle.on).toMatchTypeOf<Partial<Record<EventType, NonEmptyArray<unknown>>> | undefined>();
@@ -66,14 +66,14 @@ test('State actions and conditions', () => {
   expectTypeOf(condCheck).toMatchTypeOf<(ctx: Context) => boolean>();
 
   // Проверка типов действий при входе и выходе
-  expectTypeOf(fsmConfig.states.idle.entry).toMatchTypeOf<ActionListFSM<StateName, NoInfer<Context>> | undefined>();
-  expectTypeOf(fsmConfig.states.active.exit).toMatchTypeOf<ActionListFSM<StateName, NoInfer<Context>> | undefined>();
+  expectTypeOf(fsmConfig.states.idle.entry).toMatchTypeOf<StateMachineActionList<StateName, NoInfer<Context>> | undefined>();
+  expectTypeOf(fsmConfig.states.active.exit).toMatchTypeOf<StateMachineActionList<StateName, NoInfer<Context>> | undefined>();
 });
 
 test('Invalid context configuration', () => {
   // Негативная проверка для неправильного типа контекста
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const wrongContext: ConfigFSM<StateName, EventType, Context> = {
+  const wrongContext: StateMachineConfig<StateName, EventType, Context> = {
     initState: 'idle',
     // @ts-expect-error: тип свойства 'invalidField' не существует в типе 'Context'
     context: { invalidField: 'test' },

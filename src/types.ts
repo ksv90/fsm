@@ -1,62 +1,57 @@
-export const enum StatusesFSM {
-  notStarted,
-  active,
-  stopped,
-}
-
-export interface IFiniteStateMachine<TStateName extends string, TEventType extends string, TContext extends object> {
-  get stateName(): TStateName;
-  get status(): StatusesFSM;
-  getContext(): TContext;
-  start(): void;
-  stop(): void;
-  send(eventType: TEventType): void;
-}
+import { fsmStatuses } from './constants';
 
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export type PartialOneRecord<K extends PropertyKey, V> = Partial<Record<K, V>> & { [P in K]: Required<Pick<Record<K, V>, P>> }[K];
 
-export type StateDataАЫЬ<TStateName extends string> = {
+export type StateMachineStateData<TStateName extends string> = {
   stateName: TStateName;
 };
 
-export type CondFuncFSM<TStateName extends string, TContext extends object> = (context: TContext, stateData: StateDataАЫЬ<TStateName>) => boolean;
+export type StateMachineCondFunction<TStateName extends string, TContext extends object> = (
+  context: TContext,
+  stateData: StateMachineStateData<TStateName>,
+) => boolean;
 
-export type CompleteFuncFSM = () => void;
+export type StateMachineCompleteFunction = () => void;
 
-export type JobFuncFSM<TContext extends object> = (context: TContext, complete: CompleteFuncFSM) => void | Promise<void>;
+export type StateMachineJobFunction<TContext extends object> = (context: TContext, complete: StateMachineCompleteFunction) => void | Promise<void>;
 
-export type ActionFuncFSM<TStateName extends string, TContext extends object> = (context: TContext, stateData: StateDataАЫЬ<TStateName>) => void;
+export type StateMachineActionFunction<TStateName extends string, TContext extends object> = (
+  context: TContext,
+  stateData: StateMachineStateData<TStateName>,
+) => void;
 
-export type ActionListFSM<TStateName extends string, TContext extends object> = NonEmptyArray<ActionFuncFSM<TStateName, TContext>>;
+export type StateMachineActionList<TStateName extends string, TContext extends object> = NonEmptyArray<
+  StateMachineActionFunction<TStateName, TContext>
+>;
 
-export type TransitionObjectFSM<TStateName extends string, TContext extends object> = {
+export type StateMachineTransitionObject<TStateName extends string, TContext extends object> = {
   target: TStateName;
-  actions?: ActionListFSM<TStateName, TContext>;
-  cond?: CondFuncFSM<TStateName, TContext>;
+  actions?: StateMachineActionList<TStateName, TContext>;
+  cond?: StateMachineCondFunction<TStateName, TContext>;
 };
 
-export type EmitObjectFSM<TStateName extends string, TEventType extends string, TContext extends object> = {
+export type StateMachineEmitObject<TStateName extends string, TEventType extends string, TContext extends object> = {
   eventType: TEventType;
-  cond?: CondFuncFSM<TStateName, TContext>;
+  cond?: StateMachineCondFunction<TStateName, TContext>;
 };
 
-export type StateFSM<TStateName extends string, TEventType extends string, TContext extends object> = {
-  entry?: ActionListFSM<TStateName, TContext>;
-  job?: JobFuncFSM<TContext>;
-  exit?: ActionListFSM<TStateName, TContext>;
-  on?: PartialOneRecord<TEventType, NonEmptyArray<TransitionObjectFSM<TStateName, TContext>>>;
-  emit?: NonEmptyArray<EmitObjectFSM<TStateName, TEventType, TContext>>;
+export type StateMachineState<TStateName extends string, TEventType extends string, TContext extends object> = {
+  entry?: StateMachineActionList<TStateName, TContext>;
+  job?: StateMachineJobFunction<TContext>;
+  exit?: StateMachineActionList<TStateName, TContext>;
+  on?: PartialOneRecord<TEventType, NonEmptyArray<StateMachineTransitionObject<TStateName, TContext>>>;
+  emit?: NonEmptyArray<StateMachineEmitObject<TStateName, TEventType, TContext>>;
 };
 
-export type ConfigFSM<TStateName extends string, TEventType extends string, TContext extends object> = {
+export type StateMachineConfig<TStateName extends string, TEventType extends string, TContext extends object> = {
   initState: NoInfer<TStateName>;
   context: TContext;
-  states: Record<TStateName, StateFSM<NoInfer<TStateName>, NoInfer<TEventType>, NoInfer<TContext>>>;
+  states: Record<TStateName, StateMachineState<NoInfer<TStateName>, NoInfer<TEventType>, NoInfer<TContext>>>;
 };
 
-export type CustomErrorMessagesFSM = {
+export type StateMachineErrorMessages = {
   getAlreadyStartedMessage?: () => string;
   getRestartNotAllowedMessage?: () => string;
   getCannotSendIfNotStartedMessage?: () => string;
@@ -67,31 +62,42 @@ export type CustomErrorMessagesFSM = {
   getActionTimeLimitExceededMessage?: (stateName: string, errorDelay: number) => string;
 };
 
-export type OptionsFSM = {
+export type StateMachineOptions = {
   timeForWork?: number;
-  errorMessages?: CustomErrorMessagesFSM;
+  errorMessages?: StateMachineErrorMessages;
 };
 
-export type EventDataFSM<TStateName extends string, TContext extends object> = {
+export type StateMachineEventData<TStateName extends string, TContext extends object> = {
   context: TContext;
   stateName: TStateName;
 };
 
-export type TransitionEventData<TStateName extends string, TEventType extends string, TContext extends object> = {
+export type StateMachineTransitionEventData<TStateName extends string, TEventType extends string, TContext extends object> = {
   context: TContext;
   stateName: TStateName;
   nextStateName: TStateName;
   eventType: TEventType;
 };
 
-export type EventsFSM<TStateName extends string, TEventType extends string, TContext extends object> = {
-  start: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  entry: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  job: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  pending: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  transition: [eventData: TransitionEventData<TStateName, TEventType, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  exit: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  finish: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  stop: [eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
-  error: [error: Error, eventData: EventDataFSM<TStateName, TContext>, fsm: IFiniteStateMachine<TStateName, TEventType, TContext>];
+export type StateMachineStatus = (typeof fsmStatuses)[keyof typeof fsmStatuses];
+
+export interface IStateMachine<TStateName extends string, TEventType extends string, TContext extends object> {
+  get stateName(): TStateName;
+  get status(): StateMachineStatus;
+  getContext(): TContext;
+  start(): void;
+  stop(): void;
+  send(eventType: TEventType): void;
+}
+
+export type StateMachineEvents<TStateName extends string, TEventType extends string, TContext extends object> = {
+  start: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  entry: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  job: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  pending: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  transition: [eventData: StateMachineTransitionEventData<TStateName, TEventType, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  exit: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  finish: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  stop: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
+  error: [error: Error, eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
 };

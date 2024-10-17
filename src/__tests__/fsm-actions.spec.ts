@@ -1,13 +1,13 @@
-import { ConfigFSM } from 'src/types';
+import { StateMachineConfig } from 'src/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FiniteStateMachine } from '../fsm';
+import { StateMachine } from '../fsm';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
-type FSMContext = { count: number };
+type Context = { count: number };
 
-function createFSM(): ConfigFSM<StateName, EventType, FSMContext> {
+function createFSM(): StateMachineConfig<StateName, EventType, Context> {
   return {
     initState: 'idle',
     context: { count: 0 },
@@ -46,13 +46,13 @@ function createFSM(): ConfigFSM<StateName, EventType, FSMContext> {
   };
 }
 
-describe('FiniteStateMachine actions', () => {
-  let fsm: FiniteStateMachine<StateName, EventType, FSMContext>;
-  let fsmConfig: ConfigFSM<StateName, EventType, FSMContext>;
+describe('StateMachine actions', () => {
+  let fsm: StateMachine<StateName, EventType, Context>;
+  let fsmConfig: StateMachineConfig<StateName, EventType, Context>;
 
   beforeEach(() => {
     fsmConfig = createFSM();
-    fsm = new FiniteStateMachine(fsmConfig);
+    fsm = new StateMachine(fsmConfig);
     fsm.start();
   });
 
@@ -82,7 +82,7 @@ describe('FiniteStateMachine actions', () => {
   });
 
   it('synchronous action call count', () => {
-    const syncActionSpy = vi.fn((context: FSMContext) => {
+    const syncActionSpy = vi.fn((context: Context) => {
       context.count += 1;
     });
 
@@ -95,7 +95,7 @@ describe('FiniteStateMachine actions', () => {
   });
 
   it('asynchronous action call count', async () => {
-    const asyncActionSpy = vi.fn(async (context: FSMContext) => {
+    const asyncActionSpy = vi.fn(async (context: Context) => {
       await new Promise((r) => setTimeout(r, 100));
       context.count -= 1;
     });
