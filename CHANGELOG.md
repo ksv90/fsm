@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/ksv90/fsm/compare/v0.0.4...v0.0.5) (2024-10-17)
+
+
+### Bug Fixes
+
+* types renamed ([c93f51a](https://github.com/ksv90/fsm/commit/c93f51a248b636b5ac3974c30f5ce25fb8d3fb57))
+
 ## [0.0.4](https://github.com/ksv90/fsm/compare/v0.0.3...v0.0.4) (2024-10-16)
 
 
