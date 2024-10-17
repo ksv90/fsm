@@ -1,19 +1,19 @@
+import { fsmStatuses } from 'src/constants';
 import { describe, expect, it, vi } from 'vitest';
 
-import { FiniteStateMachine } from '../fsm';
-import { StatusesFSM } from '../types';
+import { StateMachine } from '../fsm';
 
-describe('FiniteStateMachine basic functionality', () => {
-  it('should start the FSM successfully', () => {
-    const fsm = new FiniteStateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
+describe('StateMachine basic functionality', () => {
+  it('should start the  StateMachine successfully', () => {
+    const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     fsm.start();
-    expect(fsm.status).toBe(StatusesFSM.active);
+    expect(fsm.status).toBe(fsmStatuses.active);
   });
 
-  it('should throw an error when starting an already active FSM', () => {
-    const fsm = new FiniteStateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
+  it('should throw an error when starting an already active StateMachine', () => {
+    const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     const handler = vi.fn<[Error]>((error) => {
-      expect(error.message).toBe('FSM is already started');
+      expect(error.message).toBe('StateMachine is already started');
     });
     fsm.on('error', handler);
     fsm.start();
@@ -21,21 +21,21 @@ describe('FiniteStateMachine basic functionality', () => {
     expect(handler).toHaveBeenCalled();
   });
 
-  it('should stop the FSM successfully', () => {
-    const fsm = new FiniteStateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
+  it('should stop the  StateMachine successfully', () => {
+    const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     fsm.start();
     fsm.stop();
-    expect(fsm.status).toBe(StatusesFSM.stopped);
+    expect(fsm.status).toBe(fsmStatuses.stopped);
   });
 
   it('should stop the not running fsm', () => {
-    const fsm = new FiniteStateMachine({ initState: 'idle', context: {}, states: { idle: {} } });
+    const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: {} } });
     fsm.stop();
-    expect(fsm.status).toBe(StatusesFSM.stopped);
+    expect(fsm.status).toBe(fsmStatuses.stopped);
   });
 
   it('should transition to another state on a valid event', () => {
-    const fsm = new FiniteStateMachine({
+    const fsm = new StateMachine({
       initState: 'idle',
       context: {},
       states: {
@@ -49,7 +49,7 @@ describe('FiniteStateMachine basic functionality', () => {
   });
 
   it('should throw an error on unsupported event', () => {
-    const fsm = new FiniteStateMachine({
+    const fsm = new StateMachine({
       initState: 'idle',
       context: {},
       states: { idle: { on: { NEXT: [{ target: 'running' }] } }, running: { on: { INVALID_EVENT: [{ target: 'idle' }] } } },
@@ -64,7 +64,7 @@ describe('FiniteStateMachine basic functionality', () => {
   });
 
   it('should handle conditional transition correctly', () => {
-    const fsm = new FiniteStateMachine({
+    const fsm = new StateMachine({
       initState: 'idle',
       context: { canStart: true },
       states: {
@@ -83,7 +83,7 @@ describe('FiniteStateMachine basic functionality', () => {
 
   it('should process asynchronous action correctly', async () => {
     const job = vi.fn<[unknown]>((_) => setTimeout(() => undefined, 100));
-    const fsm = new FiniteStateMachine({
+    const fsm = new StateMachine({
       initState: 'idle',
       context: {},
       states: {
@@ -101,8 +101,8 @@ describe('FiniteStateMachine basic functionality', () => {
     expect(job).toHaveBeenCalled();
   });
 
-  it('should reach final state and stop FSM', () => {
-    const fsm = new FiniteStateMachine({
+  it('should reach final state and stop  StateMachine', () => {
+    const fsm = new StateMachine({
       initState: 'idle',
       context: {},
       states: {
@@ -112,6 +112,6 @@ describe('FiniteStateMachine basic functionality', () => {
     });
     fsm.start();
     fsm.send('FINISH');
-    expect(fsm.status).toBe(StatusesFSM.stopped);
+    expect(fsm.status).toBe(fsmStatuses.stopped);
   });
 });

@@ -1,9 +1,9 @@
 import { bench } from 'vitest';
 
-import { FiniteStateMachine } from '../fsm';
+import { StateMachine } from '../fsm';
 
-bench('FiniteStateMachine performance under load', () => {
-  const fsm = new FiniteStateMachine({
+bench('StateMachine performance under load', () => {
+  const fsm = new StateMachine({
     initState: 'idle',
     context: {},
     states: {

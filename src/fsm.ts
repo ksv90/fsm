@@ -1,34 +1,43 @@
-import { Emitter, IEmitter } from '@ksv90/decorators';
+import { Emitter, type IEmitter } from '@ksv90/decorators';
 
+import { fsmStatuses } from './constants';
 import { createJob } from './helpers';
-import { ActionFuncFSM, ConfigFSM, EventsFSM, IFiniteStateMachine, OptionsFSM, StateFSM, StatusesFSM } from './types';
+import type {
+  IStateMachine,
+  StateMachineActionFunction,
+  StateMachineConfig,
+  StateMachineEvents,
+  StateMachineOptions,
+  StateMachineState,
+  StateMachineStatus,
+} from './types';
 
-export interface FiniteStateMachine<TStateName extends string, TEventType extends string, TContext extends object>
-  extends IEmitter<EventsFSM<TStateName, TEventType, TContext>> {}
+export interface StateMachine<TStateName extends string, TEventType extends string, TContext extends object>
+  extends IEmitter<StateMachineEvents<TStateName, TEventType, TContext>> {}
 
 export
 @Emitter()
-class FiniteStateMachine<TStateName extends string, TEventType extends string, TContext extends object>
-  implements IFiniteStateMachine<TStateName, TEventType, TContext>
+class StateMachine<TStateName extends string, TEventType extends string, TContext extends object>
+  implements IStateMachine<TStateName, TEventType, TContext>
 {
-  #status: StatusesFSM = StatusesFSM.notStarted;
+  #status: StateMachineStatus = fsmStatuses.notStarted;
 
   #stateName: TStateName;
 
   #stateId: object; // the object reference satisfies the requirements for id
 
-  readonly #options: OptionsFSM;
+  readonly #options: StateMachineOptions;
 
   readonly #context: TContext;
 
-  readonly #stateList: Record<TStateName, StateFSM<TStateName, TEventType, TContext>>;
+  readonly #stateList: Record<TStateName, StateMachineState<TStateName, TEventType, TContext>>;
 
-  readonly #jobs = new Set<Promise<void>>();
+  readonly #jobList = new Set<Promise<void>>();
 
-  readonly #actionHandler = (action: ActionFuncFSM<TStateName, TContext>): void => action(this.#context, { stateName: this.#stateName });
+  readonly #actionHandler = (action: StateMachineActionFunction<TStateName, TContext>): void => action(this.#context, { stateName: this.#stateName });
 
   readonly #sendError = (error: unknown): void => {
-    if (this.#status === StatusesFSM.stopped) return;
+    if (this.#status === fsmStatuses.stopped) return;
     let errorInstance: Error;
     if (error instanceof Error) errorInstance = error;
     else if (typeof error === 'string') errorInstance = new Error(error);
@@ -38,7 +47,7 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     this.stop();
   };
 
-  constructor(config: ConfigFSM<TStateName, TEventType, TContext>, options?: OptionsFSM) {
+  constructor(config: StateMachineConfig<TStateName, TEventType, TContext>, options?: StateMachineOptions) {
     this.#stateName = config.initState;
     this.#context = config.context;
     this.#stateList = config.states;
@@ -46,7 +55,7 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     this.#stateId = {};
   }
 
-  get status(): StatusesFSM {
+  get status(): StateMachineStatus {
     return this.#status;
   }
 
@@ -60,20 +69,20 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
 
   start(): void {
     switch (this.#status) {
-      case StatusesFSM.active: {
+      case fsmStatuses.active: {
         const message = this.#options.errorMessages?.getAlreadyStartedMessage?.();
-        this.#sendError(message ?? 'FSM is already started');
+        this.#sendError(message ?? 'StateMachine is already started');
         return;
       }
-      case StatusesFSM.stopped: {
+      case fsmStatuses.stopped: {
         const message = this.#options.errorMessages?.getRestartNotAllowedMessage?.();
-        this.#sendError(message ?? 'Cannot restart a stopped FSM');
+        this.#sendError(message ?? 'Cannot restart a stopped StateMachine');
         return;
       }
     }
     const [stateName, context] = [this.#stateName, this.#context];
     const currentState = this.#stateList[stateName];
-    this.#status = StatusesFSM.active;
+    this.#status = fsmStatuses.active;
     this.emit('start', { context, stateName }, this);
     this.emit('entry', { context, stateName }, this);
     currentState.entry?.forEach(this.#actionHandler);
@@ -81,8 +90,8 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
   }
 
   stop(): void {
-    if (this.#status === StatusesFSM.stopped) return;
-    this.#status = StatusesFSM.stopped;
+    if (this.#status === fsmStatuses.stopped) return;
+    this.#status = fsmStatuses.stopped;
     this.emit('stop', { context: this.#context, stateName: this.#stateName }, this);
     this.removeAllListeners();
   }
@@ -92,14 +101,14 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     const currentState = stateList[stateName];
 
     switch (this.#status) {
-      case StatusesFSM.notStarted: {
+      case fsmStatuses.notStarted: {
         const message = this.#options.errorMessages?.getCannotSendIfNotStartedMessage?.();
-        this.#sendError(message ?? 'Cannot send events to an FSM that is not started');
+        this.#sendError(message ?? 'Cannot send events to an StateMachine that is not started');
         return;
       }
-      case StatusesFSM.stopped: {
+      case fsmStatuses.stopped: {
         const message = this.#options.errorMessages?.getCannotSendWhenStoppedMessage?.();
-        this.#sendError(message ?? 'Cannot send events to a stopped FSM');
+        this.#sendError(message ?? 'Cannot send events to a stopped StateMachine');
         return;
       }
     }
@@ -151,13 +160,13 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
       this.emit('job', { context, stateName }, this);
       const timerId = this.#startTimer();
       const job = createJob(currentState.job, context);
-      this.#jobs.add(job);
+      this.#jobList.add(job);
       await job;
-      this.#jobs.delete(job);
+      this.#jobList.delete(job);
       if (timerId) clearTimeout(timerId);
     }
 
-    if (this.#status === StatusesFSM.stopped) return;
+    if (this.#status === fsmStatuses.stopped) return;
     if (this.#stateId !== stateId) return;
 
     const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
@@ -166,8 +175,8 @@ class FiniteStateMachine<TStateName extends string, TEventType extends string, T
     if (currentState.on) {
       this.emit('pending', { context, stateName }, this);
     } else {
-      if (this.#jobs.size) await Promise.all(this.#jobs.values());
-      if (this.#status !== StatusesFSM.active) return;
+      if (this.#jobList.size) await Promise.all(this.#jobList.values());
+      if (this.#status !== fsmStatuses.active) return;
       this.emit('finish', { context, stateName }, this);
       this.stop();
     }

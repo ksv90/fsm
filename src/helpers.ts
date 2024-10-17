@@ -1,6 +1,6 @@
-import { JobFuncFSM } from './types';
+import { StateMachineJobFunction } from './types';
 
-export const createJob = <TContext extends object>(job: JobFuncFSM<TContext>, context: TContext) => {
+export const createJob = <TContext extends object>(job: StateMachineJobFunction<TContext>, context: TContext) => {
   return new Promise<void>((resolve, reject) => {
     try {
       const result = job(context, resolve);

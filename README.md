@@ -31,6 +31,8 @@ npm install @ksv90/fsm
 
 This command will add the library to your project's dependencies, allowing you to use the FSM in your code.
 
+FSM requires the @ksv90/decorators package, which is listed as peerDependencies. This means that for npm versions higher than 7, the package will be added automatically if it is not in the core dependencies. Otherwise, you need to add it manually.
+
 
 ## Quick Start
 
