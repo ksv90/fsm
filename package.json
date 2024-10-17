@@ -27,7 +27,7 @@
     "prepublish": "pnpm run build"
   },
   "peerDependencies": {
-    "@ksv90/decorators": "^0.1.3"
+    "@ksv90/decorators": "^0.1.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.6.1",
