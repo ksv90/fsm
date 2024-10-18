@@ -31,17 +31,17 @@ npm install @ksv90/fsm
 
 Эта команда добавит библиотеку в зависимости вашего проекта, после чего вы сможете использовать FSM в своем коде.
 
-Для работы FSM требуется пакет @ksv90/decorators, который указан как peerDependencies. Это означает, что для npm версии выше 7, пакет будет добавлен автоматически, если его нет в основных зависимостях. Иначе необходимо добавить его вручную.
+Для работы FSM требуется пакет [@ksv90/decorators](https://github.com/ksv90/decorators), который указан как peerDependencies. Это означает, что для npm версии выше 7, пакет будет добавлен автоматически, если его нет в основных зависимостях. Иначе необходимо добавить его вручную.
 
 ## Быстрый старт
 
 Ниже приведен пример быстрого использования конечного автомата (FSM). Этот пример покажет, как создать простой FSM, добавить слушателей событий и управлять переходами между состояниями.
 
 ```ts
-import { FiniteStateMachine } from './fsm';
+import { StateMachine } from './fsm';
 
 // Создание новой FSM с начальными состояниями
-const fsm = new FiniteStateMachine({
+const fsm = new StateMachine({
   initState: 'idle',
   context: {},
   states: {
@@ -76,7 +76,7 @@ Finite State Machine (FSM) управляет переходами между с
 Пример структуры состояний:
 
 ```ts
-const fsm = new FiniteStateMachine({
+const fsm = new StateMachine({
   initState: 'idle',
   context: { count: 0 },
   states: {
@@ -213,12 +213,12 @@ fsm.on('entry', (context) => {
 
 ### Настройка и опции
 
-Finite State Machine (FSM) поддерживает различные параметры конфигурации, которые позволяют настраивать поведение конечного автомата и обработку ошибок. Эти параметры определяются с использованием типов OptionsFSM и CustomErrorMessagesFSM.
+Finite State Machine (FSM) поддерживает различные параметры конфигурации, которые позволяют настраивать поведение конечного автомата и обработку ошибок. Эти параметры определяются с использованием типов StateMachineOptions и CustomErrorMessagesFSM.
 
-Параметры OptionsFSM
+Параметры StateMachineOptions
 
 ```ts
-export type OptionsFSM = {
+export type StateMachineOptions = {
   timeForWork?: number;
   errorMessages?: {
     getAlreadyStartedMessage?: () => string;
@@ -235,14 +235,14 @@ export type OptionsFSM = {
 - timeForWork: Время в миллисекундах, отведенное на выполнение задач в состоянии перед тем, как будет превышено время ожидания. Если задача не завершится за отведенное время, будет вызвано сообщение об ошибке. Использование: Этот параметр полезен для ограничения времени выполнения асинхронных задач в состоянии и предотвращения потенциальной утечки памяти.
 
 ```ts
-const options: OptionsFSM = {
+const options: StateMachineOptions = {
   timeForWork: 5000, // 5 секунд на выполнение задачи
 };
 ```
 
 - errorMessages: Объект, содержащий настраиваемые сообщения об ошибках для различных ситуаций, которые могут возникнуть во время работы FSM. Позволяет настраивать текст сообщений об ошибках, чтобы сделать их более информативными и понятными для пользователя.
 ```ts
-const options: OptionsFSM = {
+const options: StateMachineOptions = {
   errorMessages: {
     getAlreadyStartedMessage: () => 'FSM уже запущен и не может быть запущен снова.',
   },
