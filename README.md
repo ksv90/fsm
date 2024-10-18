@@ -31,7 +31,7 @@ npm install @ksv90/fsm
 
 This command will add the library to your project's dependencies, allowing you to use the FSM in your code.
 
-FSM requires the @ksv90/decorators package, which is listed as peerDependencies. This means that for npm versions higher than 7, the package will be added automatically if it is not in the core dependencies. Otherwise, you need to add it manually.
+FSM requires the [@ksv90/decorators](https://github.com/ksv90/decorators) package, which is listed as peerDependencies. This means that for npm versions higher than 7, the package will be added automatically if it is not in the core dependencies. Otherwise, you need to add it manually.
 
 
 ## Quick Start
@@ -39,10 +39,10 @@ FSM requires the @ksv90/decorators package, which is listed as peerDependencies.
 Below is a quick example of using a Finite State Machine (FSM). This example demonstrates how to create a simple FSM, add event listeners, and manage transitions between states.
 
 ```ts
-import { FiniteStateMachine } from './fsm';
+import { StateMachine } from './fsm';
 
 // Creating a new FSM with initial states
-const fsm = new FiniteStateMachine({
+const fsm = new StateMachine({
   initState: 'idle',
   context: {},
   states: {
@@ -78,7 +78,7 @@ Finite State Machine (FSM) manages transitions between states based on events. E
 Example state structure:
 
 ```ts
-const fsm = new FiniteStateMachine({
+const fsm = new StateMachine({
   initState: 'idle',
   context: { count: 0 },
   states: {
@@ -216,12 +216,12 @@ Each of these events passes specific data to the handler, allowing you to react 
 
 ### Configuration and Options
 
-Finite State Machine (FSM) supports various configuration options that allow you to adjust its behavior and error handling using the types OptionsFSM and CustomErrorMessagesFSM.
+Finite State Machine (FSM) supports various configuration options that allow you to adjust its behavior and error handling using the types StateMachineOptions and CustomErrorMessagesFSM.
 
-Example of OptionsFSM:
+Example of StateMachineOptions:
 
 ```ts
-export type OptionsFSM = {
+export type StateMachineOptions = {
   timeForWork?: number;
   errorMessages?: {
     getAlreadyStartedMessage?: () => string;
@@ -238,7 +238,7 @@ export type OptionsFSM = {
 - timeForWork: The time in milliseconds allowed for tasks in the state to execute before timing out. If the task does not complete in the allotted time, an error message will be raised. Usage: This parameter is useful for limiting the time asynchronous tasks execute in the state and preventing potential memory leaks.
 
 ```ts
-const options: OptionsFSM = {
+const options: StateMachineOptions = {
   timeForWork: 5000, // 5 seconds to complete the task
 };
 ```
@@ -246,7 +246,7 @@ const options: OptionsFSM = {
 - errorMessages: An object containing custom error messages for various situations that may occur during FSM operation. Allows you to customize the text of error messages to make them more informative and understandable to the user.
 
 ```ts
-const options: OptionsFSM = {
+const options: StateMachineOptions = {
   errorMessages: {
     getAlreadyStartedMessage: () => 'FSM is already running and cannot be started again',
   },
