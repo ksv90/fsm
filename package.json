@@ -1,8 +1,8 @@
 {
   "name": "@ksv90/fsm",
   "version": "0.0.1",
-  "description": "",
-  "keywords": [],
+  "description": "Finite State Machine (FSM)",
+  "keywords": ["Finite State Machine", "FSM", "State Machine"],
   "author": "ksv90",
   "license": "MIT",
   "main": "dist/main.js",

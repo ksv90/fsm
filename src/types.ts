@@ -90,7 +90,7 @@ export interface IStateMachine<TStateName extends string, TEventType extends str
   send(eventType: TEventType): void;
 }
 
-export type StateMachineEvents<TStateName extends string, TEventType extends string, TContext extends object> = {
+export interface StateMachineEvents<TStateName extends string, TEventType extends string, TContext extends object> {
   start: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
   entry: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
   job: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
@@ -100,4 +100,4 @@ export type StateMachineEvents<TStateName extends string, TEventType extends str
   finish: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
   stop: [eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
   error: [error: Error, eventData: StateMachineEventData<TStateName, TContext>, fsm: IStateMachine<TStateName, TEventType, TContext>];
-};
+}
