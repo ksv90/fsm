@@ -62,8 +62,8 @@ fsm.on('transition', ({ stateName, nextStateName }) => {
 
 // Starting the FSM and state transitions
 fsm.start(); // Transitions to the 'idle' state
-fsm.send('START'); // Transitions to the 'running' state
-fsm.send('STOP'); // Transitions back to the 'idle' state
+fsm.transition('START'); // Transitions to the 'running' state
+fsm.transition('STOP'); // Transitions back to the 'idle' state
 ```
 
 This example shows how easy it is to create a finite state machine, start it, add listeners, and manage states using an event-driven model.
@@ -107,16 +107,16 @@ states: An object containing the state definitions and possible transitions.
 
 ### External State Transitions
 
-FSM reacts to events that trigger state transitions. Events are sent using the send method.
+FSM reacts to events that trigger state transitions. Events are sent using the transition method.
 
 Example of event usage:
 
 ```ts
-fsm.send('START'); // Transition from 'idle' to 'running'
-fsm.send('STOP');  // Transition from 'running' to 'idle'
+fsm.transition('START'); // Transition from 'idle' to 'running'
+fsm.transition('STOP');  // Transition from 'running' to 'idle'
 ```
 
-- send(eventType): Sends an event to the FSM, initiating a corresponding transition if one exists for the current state.
+- transition(eventType): Sends an event to the FSM, initiating a corresponding transition if one exists for the current state.
 
 ### Transition Object
 
@@ -216,40 +216,43 @@ Each of these events passes specific data to the handler, allowing you to react 
 
 ### Configuration and Options
 
-Finite State Machine (FSM) supports various configuration options that allow you to adjust its behavior and error handling using the types StateMachineOptions and CustomErrorMessagesFSM.
+Finite State Machine (FSM) supports various configuration options that allow you to customize the behavior of the state machine. These options are defined using StateMachineOptions types.
 
 Example of StateMachineOptions:
 
 ```ts
 export type StateMachineOptions = {
-  timeForWork?: number;
-  errorMessages?: {
-    getAlreadyStartedMessage?: () => string;
-    getRestartNotAllowedMessage?: () => string;
-    getCannotSendIfNotStartedMessage?: () => string;
-    getCannotSendWhenStoppedMessage?: () => string;
-    getUnsupportedTransitionsMessage?: (stateName: string) => string;
-    getInvalidEventTypeMessage?: (stateName: string, eventType: string) => string;
-    getNoTransitionObjectMessage?: (stateName: string, eventType: string) => string;
-    getActionTimeLimitExceededMessage?: (stateName: string, errorDelay: number) => string;
+  maxJobTime?: number;
+  stopOnError?: boolean;
+  jobTimer?: () => Promise<void>;
 };
 ```
 
-- timeForWork: The time in milliseconds allowed for tasks in the state to execute before timing out. If the task does not complete in the allotted time, an error message will be raised. Usage: This parameter is useful for limiting the time asynchronous tasks execute in the state and preventing potential memory leaks.
+- maxJobTime: The time in milliseconds allowed for tasks in the state to execute before timing out. If the task does not complete in the allotted time, an error message will be raised. Usage: This parameter is useful for limiting the time asynchronous tasks execute in the state and preventing potential memory leaks. If jobTimer is specified, this parameter will be ignored. A zero or negative value does not start the timer.
 
 ```ts
 const options: StateMachineOptions = {
-  timeForWork: 5000, // 5 seconds to complete the task
+  maxJobTime: 5000, // 5 seconds to complete the task
 };
 ```
 
-- errorMessages: An object containing custom error messages for various situations that may occur during FSM operation. Allows you to customize the text of error messages to make them more informative and understandable to the user.
+- stopOnError: Whether to stop the FSM when an internal error occurs. Defaults to true. This does not apply to runtime errors, only errors that are sent to the error event.
 
 ```ts
 const options: StateMachineOptions = {
-  errorMessages: {
-    getAlreadyStartedMessage: () => 'FSM is already running and cannot be started again',
-  },
+  stopOnError: false
+};
+```
+
+- jobTimer: An asynchronous function that will be called together with the job function. If the timer completes before job, the FSM will emit an error event. If timer is not specified, setTimeout will be used.
+
+```ts
+const options: StateMachineOptions = {
+  jobTimer: async () => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
+}
 };
 ```
 

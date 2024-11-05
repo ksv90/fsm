@@ -1,6 +1,5 @@
+import { StateMachine } from 'src/fsm';
 import { bench } from 'vitest';
-
-import { StateMachine } from '../fsm';
 
 bench('StateMachine performance under load', () => {
   const fsm = new StateMachine({
@@ -13,6 +12,6 @@ bench('StateMachine performance under load', () => {
   fsm.start();
 
   for (let i = 0; i < 10000; i++) {
-    fsm.send('NEXT');
+    fsm.transition('NEXT');
   }
 });

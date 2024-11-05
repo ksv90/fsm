@@ -1,7 +1,6 @@
+import { StateMachine } from 'src/fsm';
 import { StateMachineConfig } from 'src/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { StateMachine } from '../fsm';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
@@ -58,7 +57,7 @@ describe('StateMachine actions', () => {
 
   it('synchronous action execution', () => {
     // Отправляем событие, которое триггерит синхронное действие
-    fsm.send('START');
+    fsm.transition('START');
 
     // Проверяем, что состояние изменилось на 'active'
     expect(fsm.stateName).toBe('active');
@@ -68,8 +67,8 @@ describe('StateMachine actions', () => {
   });
 
   it('asynchronous action execution', async () => {
-    fsm.send('START');
-    fsm.send('STOP');
+    fsm.transition('START');
+    fsm.transition('STOP');
 
     // Подождем, чтобы асинхронное действие выполнилось
     await new Promise((resolve) => setTimeout(resolve, 150));
@@ -89,7 +88,7 @@ describe('StateMachine actions', () => {
     // Модифицируем конфигурацию для использования spy
     fsmConfig.states.idle.on = { START: [{ target: 'active', actions: [syncActionSpy] }] };
 
-    fsm.send('START');
+    fsm.transition('START');
 
     expect(syncActionSpy).toHaveBeenCalledOnce();
   });
@@ -103,8 +102,8 @@ describe('StateMachine actions', () => {
     // Модифицируем конфигурацию для использования spy
     fsmConfig.states.active.on = { STOP: [{ target: 'stopped', actions: [asyncActionSpy] }] };
 
-    fsm.send('START');
-    fsm.send('STOP');
+    fsm.transition('START');
+    fsm.transition('STOP');
 
     await new Promise((resolve) => setTimeout(resolve, 150));
     expect(asyncActionSpy).toHaveBeenCalledOnce();

@@ -61,8 +61,8 @@ fsm.on('transition', ({ stateName, nextStateName }) => {
 
 // Запуск FSM и переходы между состояниями
 fsm.start(); // Переход в состояние 'idle'
-fsm.send('START'); // Переход в состояние 'running'
-fsm.send('STOP'); // Переход в состояние 'idle'
+fsm.transition('START'); // Переход в состояние 'running'
+fsm.transition('STOP'); // Переход в состояние 'idle'
 ```
 
 Этот пример демонстрирует простоту создания конечного автомата, его запуск, добавление слушателей и управление состояниями с использованием событийной модели.
@@ -104,16 +104,16 @@ const fsm = new StateMachine({
 - states: Объект, содержащий определения состояний и возможных переходов.
 
 ### Внешние переходы между состояниями
-FSM реагирует на события, которые инициируют переходы между состояниями. События отправляются с помощью метода ```send```.
+FSM реагирует на события, которые инициируют переходы между состояниями. События отправляются с помощью метода ```transition```.
 
 Пример использования событий:
 
 ```ts
-fsm.send('START'); // Переход из состояния 'idle' в 'running'
-fsm.send('STOP');  // Переход из состояния 'running' в 'idle'
+fsm.transition('START'); // Переход из состояния 'idle' в 'running'
+fsm.transition('STOP');  // Переход из состояния 'running' в 'idle'
 ```
 
-- ```send(eventType)```: Отправляет событие в FSM, инициируя соответствующий переход, если такой переход существует для текущего состояния.
+- ```transition(eventType)```: Отправляет событие в FSM, инициируя соответствующий переход, если такой переход существует для текущего состояния.
 
 ### Transition Object
 
@@ -213,41 +213,46 @@ fsm.on('entry', (context) => {
 
 ### Настройка и опции
 
-Finite State Machine (FSM) поддерживает различные параметры конфигурации, которые позволяют настраивать поведение конечного автомата и обработку ошибок. Эти параметры определяются с использованием типов StateMachineOptions и CustomErrorMessagesFSM.
+Finite State Machine (FSM) поддерживает различные параметры конфигурации, которые позволяют настраивать поведение конечного автомата. Эти параметры определяются с использованием типов StateMachineOptions.
 
 Параметры StateMachineOptions
 
 ```ts
 export type StateMachineOptions = {
-  timeForWork?: number;
-  errorMessages?: {
-    getAlreadyStartedMessage?: () => string;
-    getRestartNotAllowedMessage?: () => string;
-    getCannotSendIfNotStartedMessage?: () => string;
-    getCannotSendWhenStoppedMessage?: () => string;
-    getUnsupportedTransitionsMessage?: (stateName: string) => string;
-    getInvalidEventTypeMessage?: (stateName: string, eventType: string) => string;
-    getNoTransitionObjectMessage?: (stateName: string, eventType: string) => string;
-    getActionTimeLimitExceededMessage?: (stateName: string, errorDelay: number) => string;
+  maxJobTime?: number;
+  stopOnError?: boolean;
+  jobTimer?: () => Promise<void>;
 };
 ```
 
-- timeForWork: Время в миллисекундах, отведенное на выполнение задач в состоянии перед тем, как будет превышено время ожидания. Если задача не завершится за отведенное время, будет вызвано сообщение об ошибке. Использование: Этот параметр полезен для ограничения времени выполнения асинхронных задач в состоянии и предотвращения потенциальной утечки памяти.
+- maxJobTime: Время в миллисекундах, отведенное на выполнение задач в состоянии перед тем, как будет превышено время ожидания. Если задача не завершится за отведенное время, будет вызвано сообщение об ошибке. Использование: Этот параметр полезен для ограничения времени выполнения асинхронных задач в состоянии и предотвращения потенциальной утечки памяти. Если указан jobTimer, этот параметр будет проигнорирован. Нулевое или отрицательное значение не запускает таймер.
 
 ```ts
 const options: StateMachineOptions = {
-  timeForWork: 5000, // 5 секунд на выполнение задачи
+  maxJobTime: 5000, // 5 секунд на выполнение задачи
 };
 ```
 
-- errorMessages: Объект, содержащий настраиваемые сообщения об ошибках для различных ситуаций, которые могут возникнуть во время работы FSM. Позволяет настраивать текст сообщений об ошибках, чтобы сделать их более информативными и понятными для пользователя.
+- stopOnError: Останавливать ли FSM при возникновении внутренней ошибки. По умолчанию true. Это не распространяется на ошибки выполнения, только ошибки, которые отправляются в событие error.
+
 ```ts
 const options: StateMachineOptions = {
-  errorMessages: {
-    getAlreadyStartedMessage: () => 'FSM уже запущен и не может быть запущен снова.',
-  },
+  stopOnError: false
 };
 ```
+
+- jobTimer: Асинхронная функция, которая будет вызвана вместе с job-функцией. Если таймер завершится раньше job, FSM отправит error событие. Если таймер не указан, будет использован setTimeout.
+
+```ts
+const options: StateMachineOptions = {
+  jobTimer: async () => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 1000);
+  });
+}
+};
+```
+
 
 ## Обработка ошибок
 
