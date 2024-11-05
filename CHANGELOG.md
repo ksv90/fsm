@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.0](https://github.com/ksv90/fsm/compare/v0.0.6...v0.1.0) (2024-11-05)
+
+
+### Features
+
+* custom error added ([daa9d2a](https://github.com/ksv90/fsm/commit/daa9d2a8fb783d338b557e163eda0f00a90e9c0b))
+
 ## [0.0.6](https://github.com/ksv90/fsm/compare/v0.0.5...v0.0.6) (2024-10-22)
 
 
