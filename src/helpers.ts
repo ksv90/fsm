@@ -1,4 +1,4 @@
-import { StateMachineJobFunction } from './types';
+import type { StateMachineJobFunction } from './types';
 
 export const createJob = <TContext extends object>(job: StateMachineJobFunction<TContext>, context: TContext) => {
   return new Promise<void>((resolve, reject) => {

@@ -1,7 +1,6 @@
+import type { StateMachine } from 'src/fsm';
+import type { StateMachineActionList, StateMachineConfig, StateMachineState } from 'src/types';
 import { expectTypeOf, test } from 'vitest';
-
-import type { StateMachine } from '../fsm';
-import type { NonEmptyArray, StateMachineActionList, StateMachineConfig, StateMachineState, StateMachineStatus } from '../types';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
@@ -13,7 +12,7 @@ declare const fsm: StateMachine<StateName, EventType, Context>;
 test('StateMachine types', () => {
   // Проверка типов состояния и статуса StateMachine
   expectTypeOf<typeof fsm.stateName>().toEqualTypeOf<StateName>();
-  expectTypeOf<typeof fsm.status>().toEqualTypeOf<StateMachineStatus>();
+  expectTypeOf<typeof fsm.started>().toEqualTypeOf<boolean>();
 
   // Проверка типа метода getContext
   expectTypeOf<typeof fsm.getContext>().returns.toEqualTypeOf<Context>();
@@ -22,13 +21,13 @@ test('StateMachine types', () => {
   expectTypeOf<typeof fsm.start>().returns.toBeVoid();
   expectTypeOf<typeof fsm.stop>().returns.toBeVoid();
 
-  // Проверка метода send
-  expectTypeOf<typeof fsm.send>().parameters.toEqualTypeOf<[EventType]>();
-  expectTypeOf<typeof fsm.send>().returns.toBeVoid();
+  // Проверка метода transition
+  expectTypeOf<typeof fsm.transition>().parameters.toEqualTypeOf<[EventType]>();
+  expectTypeOf<typeof fsm.transition>().returns.toBeVoid();
 
   // Негативные проверки типов для события и состояния
   // @ts-expect-error: 'INVALID_EVENT' не является допустимым событием
-  fsm.send('INVALID_EVENT');
+  fsm.transition('INVALID_EVENT');
   // @ts-expect-error: 'invalid_state' не является допустимым состоянием
   expectTypeOf<typeof fsm.stateName>().toEqualTypeOf<'invalid_state'>();
 });
@@ -45,8 +44,8 @@ test('ConfigFSM types', () => {
   expectTypeOf(fsmConfig.states).toMatchTypeOf<Record<StateName, StateMachineState<StateName, EventType, Context>>>();
 
   // Проверка типов переходов для состояний (с возможным undefined)
-  expectTypeOf(fsmConfig.states.idle.on).toMatchTypeOf<Partial<Record<EventType, NonEmptyArray<unknown>>> | undefined>();
-  expectTypeOf(fsmConfig.states.active.on).toMatchTypeOf<Partial<Record<EventType, NonEmptyArray<unknown>>> | undefined>();
+  expectTypeOf(fsmConfig.states.idle.on).toMatchTypeOf<Partial<Record<EventType, unknown>> | undefined>();
+  expectTypeOf(fsmConfig.states.active.on).toMatchTypeOf<Partial<Record<EventType, unknown>> | undefined>();
 
   // Негативная проверка недопустимых переходов
   // @ts-expect-error: 'UNKNOWN_EVENT' не является допустимым типом события

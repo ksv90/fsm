@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@ksv90/decorators':
-        specifier: ^0.1.4
-        version: 0.1.4
+        specifier: ^0.4.0
+        version: 0.4.0
     devDependencies:
       '@commitlint/cli':
         specifier: ^18.6.1
@@ -330,8 +330,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
-  '@ksv90/decorators@0.1.4':
-    resolution: {integrity: sha512-h9PvLq71/o4b5GqNMk6sKdbbfjOyuF6nYfQ3ChYWPa3S30Mv/xYy3+YXj9rlc3VIZbMGeqlTxVrOETgBbOp11w==}
+  '@ksv90/decorators@0.4.0':
+    resolution: {integrity: sha512-szjmwnnJybPhEeYfYI1q6me+3KchjxiNh4tLhv5+Gew3IVgqm3PP/9GDDfZujiV0ULSPB+e3PRbhei5K8H2hjA==}
     engines: {node: '>=16.0.0'}
 
   '@microsoft/api-extractor-model@7.28.13':
@@ -2234,7 +2234,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
-  '@ksv90/decorators@0.1.4': {}
+  '@ksv90/decorators@0.4.0': {}
 
   '@microsoft/api-extractor-model@7.28.13(@types/node@20.16.11)':
     dependencies:
