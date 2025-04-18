@@ -34,10 +34,12 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
   readonly #jobList = new Set<Promise<void>>();
 
-  readonly #actionHandler = (action: StateMachineActionFunction<TStateName, TContext>): void => action(this.#context, { stateName: this.#stateName });
+  readonly #actionHandler = (action: StateMachineActionFunction<TStateName, TContext>): void => {
+    action(this.#context, { stateName: this.#stateName });
+  };
 
   readonly #sendError = (error: unknown): void => {
-    if (this.stopped) return;
+    if (this.isStopped()) return;
     let stateMachineError: StateMachineError;
     if (error instanceof StateMachineError) {
       stateMachineError = error;
@@ -51,7 +53,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       stateMachineError = new StateMachineError(errorCodes.RUNTIME_ERROR, 'unknown error');
     }
     this.emit('error', stateMachineError, { context: this.#context, stateName: this.#stateName }, this);
-    if (this.#options.stopOnError && !this.stopped) this.stop();
+    if (this.#options.stopOnError && !this.isStopped()) this.stop();
   };
 
   constructor(config: StateMachineConfig<TStateName, TEventType, TContext>, options: StateMachineOptions = {}) {
@@ -62,20 +64,20 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
     this.#options = { maxJobTime: options.maxJobTime ?? 5000, stopOnError: options.stopOnError ?? true, jobTimer: options.jobTimer };
   }
 
-  get started(): boolean {
-    return this.#status === statuses.ACTIVE;
-  }
-
-  get stopped(): boolean {
-    return this.#status === statuses.STOPPED;
-  }
-
   get stateName(): TStateName {
     return this.#stateName;
   }
 
   get activeJobs(): number {
     return this.#jobList.size;
+  }
+
+  isStarted(): boolean {
+    return this.#status === statuses.ACTIVE;
+  }
+
+  isStopped(): boolean {
+    return this.#status === statuses.STOPPED;
   }
 
   getContext(): TContext {
@@ -113,7 +115,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
   }
 
   stop(): void {
-    if (this.stopped) {
+    if (this.isStopped()) {
       throw new Error(`${this.constructor.name} is already stopped`);
     }
     this.#status = statuses.STOPPED;
@@ -144,6 +146,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
     const transitionObjects = currentState.on[eventType];
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!transitionObjects) {
       const message = `Event type "${eventType}" is not valid for the current state "${stateName}"`;
       const stateMachineError = new StateMachineError(errorCodes.INVALID_EVENT_TYPE, message);
@@ -191,17 +194,20 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       clearTimer();
     }
 
-    if (this.stopped) return;
+    if (this.isStopped()) return;
     if (this.#stateId !== stateId) return;
 
     const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
-    if (emitObject?.eventType) return this.transition(emitObject.eventType);
+    if (emitObject?.eventType) {
+      this.transition(emitObject.eventType);
+      return;
+    }
 
     if (currentState.on) {
       this.emit('pending', { context, stateName }, this);
     } else {
       if (this.#jobList.size) await Promise.all(this.#jobList.values());
-      if (this.stopped) return;
+      if (this.isStopped()) return;
       this.emit('finish', { context, stateName }, this);
       this.stop();
     }
@@ -225,7 +231,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
         .catch(this.#sendError);
     } else if (maxJobTime && maxJobTime > 0) {
       timerId = setTimeout(() => {
-        const message = `The job function in state '${stateName}' has exceeded the allowed time limit of ${maxJobTime} ms`;
+        const message = `The job function in state '${stateName}' has exceeded the allowed time limit of ${String(maxJobTime)} ms`;
         const error = new StateMachineError(errorCodes.JOB_TIME_LIMIT_EXCEEDED, message);
         this.#sendError(error);
       }, maxJobTime);

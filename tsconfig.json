@@ -1,10 +1,5 @@
 {
   "extends": ["./tsconfig.lint.json"],
   "include": ["./src"],
-  "exclude": ["**/*.{spec,bench,test(-d)?}.*"],
-  "compilerOptions": {
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true
-  }
+  "exclude": ["**/*.{spec,bench,test(-d)?}.*"]
 }

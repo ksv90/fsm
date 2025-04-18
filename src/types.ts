@@ -4,9 +4,9 @@ type NonEmptyArray<T> = [T, ...T[]];
 
 type PartialOneRecord<K extends PropertyKey, V> = Partial<Record<K, V>> & { [P in K]: Required<Pick<Record<K, V>, P>> }[K];
 
-export type StateMachineStateData<TStateName extends string> = {
+export interface StateMachineStateData<TStateName extends string> {
   stateName: TStateName;
-};
+}
 
 export type StateMachineCondFunction<TStateName extends string, TContext extends object> = (
   context: TContext,
@@ -70,10 +70,10 @@ export interface StateMachineTransitionEventData<TStateName extends string, TEve
 }
 
 export interface IStateMachine<TStateName extends string, TEventType extends string, TContext extends object> {
-  get started(): boolean;
-  get stopped(): boolean;
   get stateName(): TStateName;
   get activeJobs(): number;
+  isStarted(): boolean;
+  isStopped(): boolean;
   getContext(): TContext;
   getStates(): Record<TStateName, StateMachineState<TStateName, TEventType, TContext>>;
   hasEventType(eventType: TEventType): boolean;

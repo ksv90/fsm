@@ -7,7 +7,7 @@ export type StateMachineErrorCodes = (typeof errorCodes)[keyof typeof errorCodes
 export class StateMachineError extends Error {
   #code: StateMachineErrorCodes;
 
-  constructor(code: StateMachineErrorCodes, message?: string, options?: ErrorOptions) {
+  constructor(code: StateMachineErrorCodes, message?: string, options?: globalThis.ErrorOptions) {
     super(message, options);
     this.#code = code;
   }

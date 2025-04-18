@@ -1,4 +1,0 @@
-{
-  "*.ts": ["eslint --report-unused-disable-directives --max-warnings=0 --ext .ts --fix .", "prettier --loglevel=error --write ."],
-  "*.json": ["prettier --loglevel=error --write ."]
-}

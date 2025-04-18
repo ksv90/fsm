@@ -1,10 +1,14 @@
-import type { StateMachine } from 'src/fsm';
-import type { StateMachineActionList, StateMachineConfig, StateMachineState } from 'src/types';
 import { expectTypeOf, test } from 'vitest';
+
+import { StateMachine } from '../fsm';
+import { StateMachineActionList, StateMachineConfig, StateMachineState } from '../types';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
-type Context = { count: number };
+
+interface Context {
+  count: number;
+}
 
 declare const fsmConfig: StateMachineConfig<StateName, EventType, Context>;
 declare const fsm: StateMachine<StateName, EventType, Context>;
@@ -12,7 +16,7 @@ declare const fsm: StateMachine<StateName, EventType, Context>;
 test('StateMachine types', () => {
   // Проверка типов состояния и статуса StateMachine
   expectTypeOf<typeof fsm.stateName>().toEqualTypeOf<StateName>();
-  expectTypeOf<typeof fsm.started>().toEqualTypeOf<boolean>();
+  expectTypeOf<ReturnType<typeof fsm.isStarted>>().toEqualTypeOf<boolean>();
 
   // Проверка типа метода getContext
   expectTypeOf<typeof fsm.getContext>().returns.toEqualTypeOf<Context>();
