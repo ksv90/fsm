@@ -11,6 +11,7 @@ export const createJob = <TContext extends object>(job: StateMachineJobFunction<
         if (job.length < 2) resolve();
       }
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
       reject(error);
     }
   });

@@ -1,5 +1,3 @@
-const config = {
-  extends: ['@commitlint/config-conventional'],
-};
+import config from '@ksv90/tools/commitlint';
 
 export default config;

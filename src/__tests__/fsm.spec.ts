@@ -1,39 +1,44 @@
-import { StateMachine } from 'src/fsm';
 import { describe, expect, it, vi } from 'vitest';
+
+import { StateMachine } from '../fsm';
 
 describe('StateMachine basic functionality', () => {
   it('should throw an error when starting an already active StateMachine', () => {
     const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     fsm.start();
-    expect(() => fsm.start()).toThrowError('StateMachine is already started');
+    expect(() => {
+      fsm.start();
+    }).toThrowError('StateMachine is already started');
   });
 
   it('should throw an error when trying to terminate a stopped StateMachine', () => {
     const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     fsm.stop();
-    expect(() => fsm.stop()).toThrowError('StateMachine is already stopped');
+    expect(() => {
+      fsm.stop();
+    }).toThrowError('StateMachine is already stopped');
   });
 
   it('should start the  StateMachine successfully', () => {
     const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
-    expect(fsm.started).toBe(false);
+    expect(fsm.isStarted()).toBe(false);
     fsm.start();
-    expect(fsm.started).toBe(true);
+    expect(fsm.isStarted()).toBe(true);
   });
 
   it('should stop the  StateMachine successfully', () => {
     const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: { on: { NEXT: [{ target: 'idle' }] } } } });
     fsm.start();
     fsm.stop();
-    expect(fsm.started).toBe(false);
-    expect(fsm.stopped).toBe(true);
+    expect(fsm.isStarted()).toBe(false);
+    expect(fsm.isStopped()).toBe(true);
   });
 
   it('should stop the not running fsm', () => {
     const fsm = new StateMachine({ initState: 'idle', context: {}, states: { idle: {} } });
-    expect(fsm.stopped).toBe(false);
+    expect(fsm.isStopped()).toBe(false);
     fsm.stop();
-    expect(fsm.stopped).toBe(true);
+    expect(fsm.isStopped()).toBe(true);
   });
 
   it('should transition to another state on a valid event', () => {
@@ -114,6 +119,6 @@ describe('StateMachine basic functionality', () => {
     });
     fsm.start();
     fsm.transition('FINISH');
-    expect(fsm.stopped).toBe(true);
+    expect(fsm.isStopped()).toBe(true);
   });
 });

@@ -1,10 +1,14 @@
-import { StateMachine } from 'src/fsm';
-import { StateMachineConfig } from 'src/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { StateMachine } from '../fsm';
+import { StateMachineConfig } from '../types';
 
 type StateName = 'idle' | 'active' | 'stopped';
 type EventType = 'START' | 'STOP' | 'PAUSE';
-type Context = { count: number };
+
+interface Context {
+  count: number;
+}
 
 function createFSM(): StateMachineConfig<StateName, EventType, Context> {
   return {
@@ -34,6 +38,8 @@ function createFSM(): StateMachineConfig<StateName, EventType, Context> {
                 async (context) => {
                   await new Promise((r) => setTimeout(r, 100));
                   context.count -= 1;
+
+                  void new Promise((r) => setTimeout(r, 100));
                 },
               ],
             },
