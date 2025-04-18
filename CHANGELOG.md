@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/ksv90/fsm/compare/v0.1.0...v0.2.0) (2025-04-18)
+
+
+### Features
+
+* tools added ([c7a2892](https://github.com/ksv90/fsm/commit/c7a289275b506aa535b819b31a6db3520fa2be96))
+* tools added ([5a1ac09](https://github.com/ksv90/fsm/commit/5a1ac09ccd05de258da342f70aabcb635f6749e8))
+
 ## [0.1.0](https://github.com/ksv90/fsm/compare/v0.0.6...v0.1.0) (2024-11-05)
 
 
