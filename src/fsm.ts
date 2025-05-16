@@ -163,6 +163,11 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       return;
     }
 
+    if (!transitionObject.target) {
+      transitionObject.actions?.forEach(this.#actionHandler);
+      return;
+    }
+
     const nextStateName = transitionObject.target;
     const nextState = stateList[nextStateName];
 

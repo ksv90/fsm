@@ -4,7 +4,7 @@ import { StateMachine } from '../fsm';
 import { StateMachineConfig } from '../types';
 
 type StateName = 'idle' | 'active' | 'stopped';
-type EventType = 'START' | 'STOP' | 'PAUSE';
+type EventType = 'START' | 'STOP' | 'BREAK';
 
 interface Context {
   count: number;
@@ -113,5 +113,20 @@ describe('StateMachine actions', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 150));
     expect(asyncActionSpy).toHaveBeenCalledOnce();
+  });
+
+  it('should not make transition if there is no target', async () => {
+    const actionSpy = vi.fn();
+    // Модифицируем конфигурацию для использования spy
+    fsmConfig.states.idle.on = { ...fsmConfig.states.idle.on, BREAK: [{ actions: [actionSpy] }] };
+
+    expect(fsm.stateName).toBe('idle');
+
+    fsm.transition('BREAK');
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    expect(fsm.stateName).toBe('idle');
+    expect(actionSpy).toHaveBeenCalledOnce();
   });
 });

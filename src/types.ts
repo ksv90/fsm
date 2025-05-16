@@ -27,7 +27,7 @@ export type StateMachineActionList<TStateName extends string, TContext extends o
 >;
 
 export interface StateMachineTransitionObject<TStateName extends string, TContext extends object> {
-  target: TStateName;
+  target?: TStateName;
   actions?: StateMachineActionList<TStateName, TContext>;
   cond?: StateMachineCondFunction<TStateName, TContext>;
 }

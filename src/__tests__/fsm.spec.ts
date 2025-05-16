@@ -90,6 +90,7 @@ describe('StateMachine basic functionality', () => {
 
   it('should process asynchronous action correctly', async () => {
     const job = vi.fn<[unknown]>((_) => setTimeout(() => undefined, 100));
+    const inFn = vi.fn(() => undefined);
     const fsm = new StateMachine({
       initState: 'idle',
       context: {},
@@ -99,13 +100,16 @@ describe('StateMachine basic functionality', () => {
           on: { NEXT_EVENT: [{ target: 'running' }] },
           emit: [{ eventType: 'NEXT_EVENT' }],
         },
-        running: {},
+        running: {
+          entry: [inFn],
+        },
       },
     });
     fsm.start();
     await new Promise((resolve) => setTimeout(resolve, 200));
     expect(fsm.stateName).toBe('running');
     expect(job).toHaveBeenCalled();
+    expect(inFn).toHaveBeenCalled();
   });
 
   it('should reach final state and stop  StateMachine', () => {
