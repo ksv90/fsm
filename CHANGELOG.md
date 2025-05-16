@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/ksv90/fsm/compare/v0.2.0...v0.2.1) (2025-05-16)
+
+
+### Bug Fixes
+
+* terget type changed ([f512ec6](https://github.com/ksv90/fsm/commit/f512ec61e42a6eac8228c57adb8179306695cd3c))
+* terget type changed ([f011bda](https://github.com/ksv90/fsm/commit/f011bda47d6ad90f23ad7ef2c852862ab91f5d21))
+
 ## [0.2.0](https://github.com/ksv90/fsm/compare/v0.1.0...v0.2.0) (2025-04-18)
 
 
