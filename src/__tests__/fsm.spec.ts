@@ -89,7 +89,7 @@ describe('StateMachine basic functionality', () => {
   });
 
   it('should process asynchronous action correctly', async () => {
-    const job = vi.fn<[unknown]>((_) => setTimeout(() => undefined, 100));
+    const job = vi.fn((_: unknown, complete: () => void) => setTimeout(complete, 100));
     const inFn = vi.fn(() => undefined);
     const fsm = new StateMachine({
       initState: 'idle',
