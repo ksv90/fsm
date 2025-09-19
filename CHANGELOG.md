@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/ksv90/fsm/compare/v0.2.1...v0.3.0) (2025-09-19)
+
+
+### Features
+
+* async removed ([544ac68](https://github.com/ksv90/fsm/commit/544ac68149110ba5b0dad6047aff4f4e5969b048))
+* async removed ([aac0609](https://github.com/ksv90/fsm/commit/aac06094ad5b68fbccd147f44ef44b0ecbafb7df))
+
 ## [0.2.1](https://github.com/ksv90/fsm/compare/v0.2.0...v0.2.1) (2025-05-16)
 
 
