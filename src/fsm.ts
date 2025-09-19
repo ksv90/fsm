@@ -2,10 +2,10 @@ import { Emitter, type IEmitter } from '@ksv90/decorators';
 
 import { errorCodes, statuses } from './constants';
 import { StateMachineError } from './error';
-import { createJob } from './helpers';
 import type {
   IStateMachine,
   StateMachineActionFunction,
+  StateMachineCompleteFunction,
   StateMachineConfig,
   StateMachineEvents,
   StateMachineOptions,
@@ -32,10 +32,12 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
   readonly #stateList: Record<TStateName, StateMachineState<TStateName, TEventType, TContext>>;
 
-  readonly #jobList = new Set<Promise<void>>();
-
   readonly #actionHandler = (action: StateMachineActionFunction<TStateName, TContext>): void => {
-    action(this.#context, { stateName: this.#stateName });
+    try {
+      action(this.#context, { stateName: this.#stateName });
+    } catch (error) {
+      this.#sendError(error);
+    }
   };
 
   readonly #sendError = (error: unknown): void => {
@@ -66,10 +68,6 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
   get stateName(): TStateName {
     return this.#stateName;
-  }
-
-  get activeJobs(): number {
-    return this.#jobList.size;
   }
 
   isStarted(): boolean {
@@ -111,7 +109,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
     this.emit('start', { context, stateName }, this);
     this.emit('entry', { context, stateName }, this);
     currentState.entry?.forEach(this.#actionHandler);
-    this.#runJob().catch(this.#sendError);
+    this.#runJob();
   }
 
   stop(): void {
@@ -182,39 +180,49 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
     this.emit('entry', { context, stateName: nextStateName }, this);
     nextState.entry?.forEach(this.#actionHandler);
 
-    this.#runJob().catch(this.#sendError);
+    this.#runJob();
   }
 
-  async #runJob(): Promise<void> {
+  #runJob(): void {
     const [context, stateName, stateId] = [this.#context, this.#stateName, this.#stateId];
     const currentState = this.#stateList[this.#stateName];
+
+    const complete: StateMachineCompleteFunction = (error) => {
+      if (error) {
+        this.#sendError(error);
+        return;
+      }
+
+      if (this.isStopped()) return;
+      if (this.#stateId !== stateId) return;
+
+      const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
+      if (emitObject?.eventType) {
+        this.transition(emitObject.eventType);
+        return;
+      }
+
+      if (currentState.on) {
+        this.emit('pending', { context, stateName }, this);
+      } else {
+        if (this.isStopped()) return;
+        this.emit('finish', { context, stateName }, this);
+        this.stop();
+      }
+    };
 
     if (currentState.job) {
       this.emit('job', { context, stateName }, this);
       const clearTimer = this.#startTimer();
-      const job = createJob(currentState.job, context);
-      this.#jobList.add(job);
-      await job;
-      this.#jobList.delete(job);
-      clearTimer();
-    }
-
-    if (this.isStopped()) return;
-    if (this.#stateId !== stateId) return;
-
-    const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
-    if (emitObject?.eventType) {
-      this.transition(emitObject.eventType);
-      return;
-    }
-
-    if (currentState.on) {
-      this.emit('pending', { context, stateName }, this);
+      try {
+        currentState.job(context, complete);
+      } catch (error) {
+        this.#sendError(error);
+      } finally {
+        clearTimer();
+      }
     } else {
-      if (this.#jobList.size) await Promise.all(this.#jobList.values());
-      if (this.isStopped()) return;
-      this.emit('finish', { context, stateName }, this);
-      this.stop();
+      complete();
     }
   }
 

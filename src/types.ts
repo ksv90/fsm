@@ -13,9 +13,9 @@ export type StateMachineCondFunction<TStateName extends string, TContext extends
   stateData: StateMachineStateData<TStateName>,
 ) => boolean;
 
-export type StateMachineCompleteFunction = () => void;
+export type StateMachineCompleteFunction = (error?: unknown) => void;
 
-export type StateMachineJobFunction<TContext extends object> = (context: TContext, complete: StateMachineCompleteFunction) => void | Promise<void>;
+export type StateMachineJobFunction<TContext extends object> = (context: TContext, complete: StateMachineCompleteFunction) => void;
 
 export type StateMachineActionFunction<TStateName extends string, TContext extends object> = (
   context: TContext,
@@ -71,7 +71,6 @@ export interface StateMachineTransitionEventData<TStateName extends string, TEve
 
 export interface IStateMachine<TStateName extends string, TEventType extends string, TContext extends object> {
   get stateName(): TStateName;
-  get activeJobs(): number;
   isStarted(): boolean;
   isStopped(): boolean;
   getContext(): TContext;
