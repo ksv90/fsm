@@ -26,6 +26,12 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
   #stateId: object; // the object reference satisfies the requirements for id
 
+  protected jobData_?: {
+    stateName: TStateName;
+    wasTransition: boolean;
+    eventTypes: TEventType[];
+  };
+
   readonly #options: StateMachineOptions;
 
   readonly #context: TContext;
@@ -135,6 +141,8 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       }
     }
 
+    this.jobData_?.eventTypes.push(eventType);
+
     if (!currentState.on) {
       const message = `State "${stateName}" does not support any transitions`;
       const stateMachineError = new StateMachineError(errorCodes.UNSUPPORTED_TRANSITIONS, message);
@@ -175,6 +183,11 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
     this.emit('transition', { context, stateName, nextStateName, eventType }, this);
     transitionObject.actions?.forEach(this.#actionHandler);
 
+    if (this.jobData_) {
+      this.jobData_.wasTransition = true;
+      delete this.jobData_;
+    }
+
     this.#stateName = nextStateName;
     this.#stateId = {};
     this.emit('entry', { context, stateName: nextStateName }, this);
@@ -196,6 +209,8 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       if (this.isStopped()) return;
       if (this.#stateId !== stateId) return;
 
+      delete this.jobData_;
+
       const emitObject = currentState.emit?.find(({ cond }) => cond?.(context, { stateName }) ?? true);
       if (emitObject?.eventType) {
         this.transition(emitObject.eventType);
@@ -215,7 +230,8 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
       this.emit('job', { context, stateName }, this);
       const clearTimer = this.#startTimer();
       try {
-        currentState.job(context, complete);
+        this.jobData_ = { stateName, eventTypes: [], wasTransition: false };
+        currentState.job(context, complete, this.jobData_);
       } catch (error) {
         this.#sendError(error);
       } finally {

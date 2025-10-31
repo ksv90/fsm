@@ -1,11 +1,17 @@
 import type { StateMachineError } from './error';
 
-type NonEmptyArray<T> = [T, ...T[]];
+export type NonEmptyArray<T> = [T, ...T[]];
 
-type PartialOneRecord<K extends PropertyKey, V> = Partial<Record<K, V>> & { [P in K]: Required<Pick<Record<K, V>, P>> }[K];
+export type PartialOneRecord<K extends PropertyKey, V> = Partial<Record<K, V>> & { [P in K]: Required<Pick<Record<K, V>, P>> }[K];
 
 export interface StateMachineStateData<TStateName extends string> {
-  stateName: TStateName;
+  readonly stateName: TStateName;
+}
+
+export interface StateMachineJobData<TStateName extends string, TEventType extends string> {
+  readonly stateName: TStateName;
+  readonly wasTransition: boolean;
+  readonly eventTypes: readonly TEventType[];
 }
 
 export type StateMachineCondFunction<TStateName extends string, TContext extends object> = (
@@ -15,7 +21,11 @@ export type StateMachineCondFunction<TStateName extends string, TContext extends
 
 export type StateMachineCompleteFunction = (error?: unknown) => void;
 
-export type StateMachineJobFunction<TContext extends object> = (context: TContext, complete: StateMachineCompleteFunction) => void;
+export type StateMachineJobFunction<TStateName extends string, TEventType extends string, TContext extends object> = (
+  context: TContext,
+  complete: StateMachineCompleteFunction,
+  jobData: StateMachineJobData<TStateName, TEventType>,
+) => void;
 
 export type StateMachineActionFunction<TStateName extends string, TContext extends object> = (
   context: TContext,
@@ -39,7 +49,7 @@ export interface StateMachineEmitObject<TStateName extends string, TEventType ex
 
 export interface StateMachineState<TStateName extends string, TEventType extends string, TContext extends object> {
   entry?: StateMachineActionList<TStateName, TContext>;
-  job?: StateMachineJobFunction<TContext>;
+  job?: StateMachineJobFunction<TStateName, TEventType, TContext>;
   exit?: StateMachineActionList<TStateName, TContext>;
   on?: PartialOneRecord<TEventType, NonEmptyArray<StateMachineTransitionObject<TStateName, TContext>>>;
   emit?: NonEmptyArray<StateMachineEmitObject<TStateName, TEventType, TContext>>;
