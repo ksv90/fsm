@@ -1,6 +1,6 @@
 {
   "name": "@ksv90/fsm",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Finite State Machine (FSM)",
   "keywords": [
     "Finite State Machine",

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/ksv90/fsm/compare/v0.3.0...v0.3.1) (2025-10-31)
+
+
+### Bug Fixes
+
+* job data added ([4b68449](https://github.com/ksv90/fsm/commit/4b68449b35d7d6ba327414c16511be206e525f1d))
+* job data added ([5c9b09b](https://github.com/ksv90/fsm/commit/5c9b09b6ca7fe9c395a572ebe07453ffc9e4e1dc))
+
 ## [0.3.0](https://github.com/ksv90/fsm/compare/v0.2.1...v0.3.0) (2025-09-19)
 
 
