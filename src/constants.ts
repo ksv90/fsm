@@ -7,7 +7,6 @@ export const statuses = {
 export const errorCodes = {
   UNSUPPORTED_TRANSITIONS: 10,
   INVALID_EVENT_TYPE: 20,
-  NO_TRANSITION_OBJECT: 30,
   JOB_TIME_LIMIT_EXCEEDED: 40,
   RUNTIME_ERROR: 50,
 } as const;
