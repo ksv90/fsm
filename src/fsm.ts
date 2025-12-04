@@ -162,12 +162,7 @@ class StateMachine<TStateName extends string, TEventType extends string, TContex
 
     const transitionObject = transitionObjects.find(({ cond }) => cond?.(context, { stateName }) ?? true);
 
-    if (!transitionObject) {
-      const message = `No transition object found for event type "${eventType}" in state "${stateName}"`;
-      const stateMachineError = new StateMachineError(errorCodes.NO_TRANSITION_OBJECT, message);
-      this.#sendError(stateMachineError);
-      return;
-    }
+    if (!transitionObject) return;
 
     if (!transitionObject.target) {
       transitionObject.actions?.forEach(this.#actionHandler);
