@@ -3,9 +3,9 @@ on:
   release:
     types: [published]
 
-env:
-  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -13,5 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/install
-      - run: pnpm whoami
-      - run: pnpm publish --no-git-checks --access public
+      - run: pnpm publish --no-git-checks
