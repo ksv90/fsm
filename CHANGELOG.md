@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.11](https://github.com/ksv90/fsm/compare/v0.3.10...v0.3.11) (2025-12-25)
+
+
+### Bug Fixes
+
+* test ([a4366d7](https://github.com/ksv90/fsm/commit/a4366d70f895438e215c602c2721a7e13d970076))
+* test ([029e0bd](https://github.com/ksv90/fsm/commit/029e0bd55db4c09d6c2b7283d53da373a91ebf33))
+
 ## [0.3.10](https://github.com/ksv90/fsm/compare/v0.3.9...v0.3.10) (2025-12-25)
 
 
