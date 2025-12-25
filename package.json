@@ -27,7 +27,8 @@
     "test:unit": "vitest --run",
     "test:bench": "vitest bench --run",
     "test:type": "vitest --typecheck --run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublish": "pnpm run build"
   },
   "peerDependencies": {
     "@ksv90/decorators": "^0.5.0"
