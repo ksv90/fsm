@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.7](https://github.com/ksv90/fsm/compare/v0.3.6...v0.3.7) (2025-12-25)
+
+
+### Bug Fixes
+
+* envs added ([adc74fa](https://github.com/ksv90/fsm/commit/adc74fa1e398740f479aafaf4f36fd0ceb81fe60))
+* envs added ([199c731](https://github.com/ksv90/fsm/commit/199c731bbd6521770ac95f3354ba38faa031da03))
+
 ## [0.3.6](https://github.com/ksv90/fsm/compare/v0.3.5...v0.3.6) (2025-12-25)
 
 
