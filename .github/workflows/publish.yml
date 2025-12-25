@@ -3,9 +3,9 @@ on:
   release:
     types: [published]
 
-env:
-  GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   publish:
