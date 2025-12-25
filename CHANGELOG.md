@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.4](https://github.com/ksv90/fsm/compare/v0.3.3...v0.3.4) (2025-12-25)
+
+
+### Bug Fixes
+
+* permissions ([15a3bb6](https://github.com/ksv90/fsm/commit/15a3bb6bb96b795f91af4736cc514ae0582947ff))
+* permissions ([c441183](https://github.com/ksv90/fsm/commit/c441183b987c18608929e6bec9ada1eb8933a691))
+
 ## [0.3.3](https://github.com/ksv90/fsm/compare/v0.3.2...v0.3.3) (2025-12-25)
 
 
