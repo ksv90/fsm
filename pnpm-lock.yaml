@@ -19,8 +19,8 @@ importers:
         specifier: ^18.6.3
         version: 18.6.3
       '@ksv90/tools':
-        specifier: ^0.0.1
-        version: 0.0.1
+        specifier: ^0.0.10
+        version: 0.0.10
       '@types/node':
         specifier: ^20.17.30
         version: 20.17.30
@@ -379,9 +379,8 @@ packages:
     resolution: {integrity: sha512-31+nLoPZsDYi2wM0RIFrHJj2Kt1lagprjJZfhmbCgX75aXrsmHeDtI0c57EPlMSj5liOJlPqdlnfBXM3UgURFg==}
     engines: {node: '>=16.0.0'}
 
-  '@ksv90/tools@0.0.1':
-    resolution: {integrity: sha512-kGVaaANih32G5ufvdrzu9bWiLEziI4LEP03irZZbTYImfhK1nk1+vzdIoLx9Wtjgw3SleyMhEscxB9z+vKtwsQ==}
-    engines: {node: '>=16.0.0'}
+  '@ksv90/tools@0.0.10':
+    resolution: {integrity: sha512-qhsMMdusUsFTlc6WG4cA7KoBs14IUUaqqA2f7d3eHi2s7NK9shRaDXYrpBDjOMmubMoZqE+Y+GhvbhGSCN1xwg==}
 
   '@microsoft/api-extractor-model@7.28.13':
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}
@@ -2861,7 +2860,7 @@ snapshots:
 
   '@ksv90/decorators@0.5.0': {}
 
-  '@ksv90/tools@0.0.1': {}
+  '@ksv90/tools@0.0.10': {}
 
   '@microsoft/api-extractor-model@7.28.13(@types/node@20.17.30)':
     dependencies:
@@ -3715,7 +3714,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.0(eslint-plugin-import@2.31.0)(eslint@9.24.0(jiti@1.21.7)))(eslint@9.24.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.0)(eslint@9.24.0(jiti@1.21.7)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -3737,7 +3736,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.24.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.0(eslint-plugin-import@2.31.0)(eslint@9.24.0(jiti@1.21.7)))(eslint@9.24.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.30.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.0)(eslint@9.24.0(jiti@1.21.7))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
