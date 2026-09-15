@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.13](https://github.com/ksv90/fsm/compare/v0.3.12...v0.3.13) (2026-09-15)
+
+
+### Bug Fixes
+
+* decorators updated ([16baeaa](https://github.com/ksv90/fsm/commit/16baeaa9e010337cb6364b1a68af187b672f0edd))
+* decorators updated ([140c44f](https://github.com/ksv90/fsm/commit/140c44fb455267da7b78f48b428d64fcbbc6a8ac))
+
 ## [0.3.12](https://github.com/ksv90/fsm/compare/v0.3.11...v0.3.12) (2025-12-29)
 
 
